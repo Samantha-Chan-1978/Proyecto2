@@ -2,56 +2,66 @@
 
 function Usuarios() {
 
-    const [dataSource, setDataSource] = useState([]);
+  const [dataSource, setDataSource] = useState([]);
+  useEffect(listarUsuarios, []);
+  const history = useHistory();
 
-    useEffect(listarUsuarios, [])
+  function listarUsuarios() {
+    google.script.run
+      .withSuccessHandler(res => {
+        const usuarios = JSON.parse(res);
+        let arreglo = [];
 
-    function listarUsuarios() {
+        usuarios.map(usuario => {
+          arreglo.push({
+            key: usuario.id,
+            ...usuario,
+            acciones:
+              <Button
+                onClick={() => {
+                  history.push("/formularioRegistro/" + usuario.id);
+                }}>
+                Editar
+              </Button>
+          })
+        })
 
-        google.script.run
-        .withSuccessHandler(res => {
-            const usuarios = JSON.parse(res);
-            let arreglo = [];
+        setDataSource(arreglo);
 
-            usuarios.map(usuario => {
-                arreglo.push({
-                    key: usuario.id,
-                    ... usuario
-                })
-            })
+      }).listarUsuarios();
+  }
 
-            setDataSource(arreglo);
 
-        }).listarUsuarios();
-    }
+  const columns = [
+    {
+      title: 'Nombre completo',
+      dataIndex: 'nombreCompleto',
+      key: 'nombreCompleto',
+    },
+    {
+      title: 'Correo',
+      dataIndex: 'correo',
+      key: 'correo',
+    },
+    {
+      title: 'Contraseña',
+      dataIndex: 'contrasenia',
+      key: 'contrasenia',
+    },
+    {
+      title: 'Acciones',
+      dataIndex: 'acciones',
+      key: 'acciones',
+    },
+  ];
 
-    const columns = [
-        {
-        title: 'Nombre completo',
-        dataIndex: 'nombreCompleto',
-        key: 'nombreCompleto',
-        },
-        {
-        title: 'Correo',
-        dataIndex: 'correo',
-        key: 'correo',
-        },
-        {
-        title: 'Contraseña',
-        dataIndex: 'contrasenia',
-        key: 'contrasenia',
-        },
-        {
-        title: 'Acciones',
-        dataIndex: 'acciones',
-        key: 'acciones',
-        },
-    ];
 
-    return(
-        //<div>Usuarios</div>
-        <Table dataSource={dataSource} columns={columns} />
-    )
+
+  return (
+    <Table dataSource={dataSource} columns={columns} />
+  )
 }
+
+
 
 //</script>
